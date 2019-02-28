@@ -1,3 +1,6 @@
 completed/
+processed/
 .env
 .idea/
+*.mp4
+*.m4v
