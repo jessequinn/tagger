@@ -1,24 +1,37 @@
-import os, tvdb_api, subprocess, shutil, re
+import os, subprocess, shutil, re
 
-tvdb = tvdb_api.Tvdb()
+from tmdbv3api import TMDb, TV, Genre, Season
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+tmdb = TMDb()
+tmdb.api_key = os.getenv('API_KEY')
+tmdb.language = 'en'
+# tmdb.debug = True
+
+tv = TV()
+genre = Genre()
+genres = genre.movie_list()
+
+g = dict([(g.id, g.name) for g in genres])
+
 file_w_path = os.path.dirname(os.path.abspath(__file__))
 iTunes = "/mnt/storages/storage1/iTunes/iTunes Media/Automatically Add to iTunes"
-completed = file_w_path + "/completed"
+processed = file_w_path + "/processed"
 
-if not os.path.exists(completed):
-    print("Directory: %s doesn't exist. Will be created." % completed)
+if not os.path.exists(processed):
+    print("Directory: %s doesn't exist. Will be created." % processed)
     try:
-        os.makedirs(completed, exist_ok=True)
+        os.makedirs(processed, exist_ok=True)
     except FileExistsError:
-        print("During the mkdir operation of %s an error occurred." % completed)
+        print("During the mkdir operation of %s an error occurred." % processed)
         pass
-
-# Unicode -> ascii punctuation substitutions (left/right + single/double quotes)
-punctuation = {0x2018: 0x27, 0x2019: 0x27, 0x201C: 0x22, 0x201D: 0x22}
 
 for fileName in os.listdir(file_w_path):
     if fileName.endswith(".m4v"):
-        tv = re.findall(r"""(.*)          # Title
+        t = re.findall(r"""(.*)          # Title
                         [ .]
                         S(\d{1,2})    # Season
                         E(\d{1,2})    # Episode
@@ -26,27 +39,34 @@ for fileName in os.listdir(file_w_path):
                         (\d{3,4}p)?   # Quality
                     """, fileName, re.VERBOSE)
 
-        show = tv[0][0].replace('.', ' ')
-        season = tv[0][1]
-        episode = tv[0][2]
-        title = tvdb[show][int(season)][int(episode)]['episodename']
-        network = tvdb[show]['network']
-        description = tvdb[show][int(season)][int(episode)]['overview']
-        airDate = tvdb[show][int(season)][int(episode)]['firstaired']
-        genre = (tvdb[show]['genre'])[1:len(tvdb[show]['genre'])]
-        fileInfo = show + " - " + episode
+        show = t[0][0].replace('.', ' ')
+        s = int(t[0][1])
+        e = int(t[0][2])
 
-        # clear old meta data
-        subprocess.call(["AtomicParsley", fileName, "--metaEnema", "--overWrite"])
+        # https://developers.themoviedb.org/3/tv/get-tv-details
+        res = tv.search(show)
+        for r in res:
+            season = Season()
+            tv_details = tv.details(r.id)
+            show_season = season.details(r.id, s)
+            title = show_season.episodes[e - 1]['name']
+            network = tv_details.networks[0]['name']
+            description = show_season.episodes[e - 1]['overview']
+            airDate = show_season.episodes[e - 1]['air_date']
+            first_genre = g[r.genre_ids[0]]
 
-        # add new meta data
-        subprocess.call(
-                ["AtomicParsley", fileName, "--overWrite", "--TVShowName", show, "--TVSeasonNum",
-                 season, "--TVEpisodeNum", episode, "--title", title, "--TVNetwork", network, "--desc", description,
-                 "--longdesc", description, "--year", airDate, "--genre", genre[0], "--track", episode,
-                 "--disk", season, "--hdvideo", "true", "--stik", "TV Show"])
-        print("Metadata successfully set for - " + fileInfo)
+            # clear old meta data
+            subprocess.call(["AtomicParsley", fileName, "--metaEnema", "--overWrite"])
 
-        shutil.copy(fileName, iTunes)
-        shutil.move(fileName, completed)
-        print(fileName + " - added to iTunes.")
+            # add new meta data
+            subprocess.call(["AtomicParsley", fileName, "--overWrite", "--TVShowName", show,
+                             "--TVSeasonNum", str(s), "--TVEpisodeNum", str(e), "--title", title, "--TVNetwork",
+                             network, "--desc", description, "--longdesc", description, "--year", airDate,
+                             "--genre", first_genre, "--track", str(e), "--disk", str(s), "--hdvideo",
+                             "true", "--stik", "TV Show"])
+
+            print("Metadata successfully set for - " + fileName)
+
+            shutil.copy(fileName, iTunes)
+            shutil.move(fileName, processed)
+            print(fileName + " - added to iTunes.")

@@ -1,5 +1,5 @@
 import os, subprocess, shutil, re
-from tmdbv3api import TMDb, Movie, TV, Genre
+from tmdbv3api import TMDb, Movie, Genre
 
 from dotenv import load_dotenv
 
@@ -11,7 +11,6 @@ tmdb.language = 'en'
 # tmdb.debug = True
 
 movie = Movie()
-tv = TV()
 genre = Genre()
 genres = genre.movie_list()
 
