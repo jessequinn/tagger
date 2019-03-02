@@ -1,6 +1,6 @@
 import os, subprocess, shutil, re
 
-from tmdbv3api import TMDb, TV, Genre, Season
+from tmdbv3api import TMDb, TV, Season
 
 from dotenv import load_dotenv
 
@@ -12,10 +12,6 @@ tmdb.language = 'en'
 # tmdb.debug = True
 
 tv = TV()
-genre = Genre()
-genres = genre.movie_list()
-
-g = dict([(g.id, g.name) for g in genres])
 
 file_w_path = os.path.dirname(os.path.abspath(__file__))
 iTunes = "/mnt/storages/storage1/iTunes/iTunes Media/Automatically Add to iTunes"
@@ -53,7 +49,7 @@ for fileName in os.listdir(file_w_path):
             network = tv_details.networks[0]['name']
             description = show_season.episodes[e - 1]['overview']
             airDate = show_season.episodes[e - 1]['air_date']
-            first_genre = g[r.genre_ids[0]]
+            first_genre = tv_details.genres[0]['name']
 
             # clear old meta data
             subprocess.call(["AtomicParsley", fileName, "--metaEnema", "--overWrite"])
@@ -67,6 +63,5 @@ for fileName in os.listdir(file_w_path):
 
             print("Metadata successfully set for - " + fileName)
 
-            shutil.copy(fileName, iTunes)
             shutil.move(fileName, processed)
             print(fileName + " - added to iTunes.")
