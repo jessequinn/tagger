@@ -29,7 +29,7 @@ if not os.path.exists(processed):
         pass
 
 for fileName in os.listdir(file_w_path):
-    if fileName.endswith(".m4v"):
+    if fileName.endswith(".mp4") or fileName.endswith(".m4v"):
         m = re.findall(r"""(.*?[ .])     # title
                        (\d{4})           # year
                        [ .a-zA-Z]*       # Space, period, or words
