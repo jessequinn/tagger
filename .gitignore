@@ -4,3 +4,4 @@ processed/
 .idea/
 *.mp4
 *.m4v
+.api_key

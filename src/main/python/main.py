@@ -1,14 +1,18 @@
 from fbs_runtime.application_context import ApplicationContext, cached_property
-from PyQt5.QtWidgets import QMainWindow, QFileSystemModel, QHeaderView, QListWidgetItem
+from PyQt5.QtWidgets import QMainWindow, QFileSystemModel, QHeaderView, QListWidgetItem, QDialog
 from PyQt5.QtCore import QDir, QThread, pyqtSlot, Qt
 
 import sys
+import os
 import ui
-import os, subprocess, shutil, re
+import subprocess, shutil, re
 from tmdbv3api import TMDb, Movie, Genre, TV, Season
 from dotenv import load_dotenv
 
 load_dotenv()
+
+import pyAesCrypt
+from os import stat, remove
 
 
 class AppContext(ApplicationContext):
@@ -23,79 +27,116 @@ class AppContext(ApplicationContext):
         return MainWindow()
 
 
-class Progress(QThread):
-    def __init__(self):
-        QThread.__init__(self)
+# API Dialog Class
+# TODO: refactor
+class Dialog(QDialog, ui.Ui_Dialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.setupUi(self)
+        self.btn_bx_api_key.accepted.connect(self.save_api_key)
+        self.btn_bx_api_key.rejected.connect(self.rejected)
 
-    def run(self):
-        pass
-        # self.emit(QtCore.SIGNAL('__updateProgressBar(int)'), 0)  ## Reset progressbar value
-        # file_in = "xfile"
-        # loading = 0
-        # with open(file_in) as f:
-        #     fl_content = f.read().splitlines()
-        #     total_lines = len(fl_content)
-        #     for i, line in enumerate(fl_content):
-        #         print
-        #         line
-        #         self.emit(QtCore.SIGNAL('__updateProgressBar(int)'), i * 100 / total_lines)
-        #         sleep(0.1)
+    def save_api_key(self, f='.api_key'):
+        try:
+            with open(f, 'w') as the_file:
+                the_file.write('{0}'.format(self.pte_api_key.text()))
+        except EnvironmentError:
+            # TODO: new error message
+            print('error with file write')
+            self.rejected()
+        self.accept()
 
 
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
+# MainWindow Class
+class MainWindow(QMainWindow, ui.Ui_MainWindow):
+    def __init__(self, parent=None):
+        # super().__init__()
+        QMainWindow.__init__(self, parent)
+        self.setupUi(self)
 
         self.results = None
         self.file_name = None
         self.path = None
         self.file_w_path = []
         self.checked_episode_titles = []
+        self.checked_movie_titles = []
         self.checked_files = []
 
-        self.ui = ui.Ui_MainWindow()
-        self.ui.setupUi(self)
+        # self.= Ui_MainWindow()
+        # self.setupUi(self)
 
         # setup directories and files
         path = QDir.homePath()
 
-        self.ui.dirModel = QFileSystemModel()
-        self.ui.dirModel.setRootPath(QDir.rootPath())
-        self.ui.dirModel.setFilter(QDir.NoDotAndDotDot | QDir.AllDirs)
+        self.dirModel = QFileSystemModel()
+        self.dirModel.setRootPath(QDir.rootPath())
+        self.dirModel.setFilter(QDir.NoDotAndDotDot | QDir.AllDirs)
 
-        self.ui.fileModel = QFileSystemModel()
-        self.ui.fileModel.setFilter(QDir.NoDotAndDotDot | QDir.Files)
+        self.fileModel = QFileSystemModel()
+        self.fileModel.setFilter(QDir.NoDotAndDotDot | QDir.Files)
 
-        self.ui.treeView.setModel(self.ui.dirModel)
-        self.ui.listView.setModel(self.ui.fileModel)
+        self.treeView.setModel(self.dirModel)
+        self.listView.setModel(self.fileModel)
 
-        self.ui.treeView.setRootIndex(self.ui.dirModel.index(path))
-        self.ui.listView.setRootIndex(self.ui.fileModel.index(path))
+        self.treeView.setRootIndex(self.dirModel.index(path))
+        self.listView.setRootIndex(self.fileModel.index(path))
 
-        self.hv = self.ui.treeView.header()
+        self.hv = self.treeView.header()
         self.hv.setSectionHidden(1, 1)
         self.hv.setSectionHidden(2, 1)
         self.hv.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
         # by default let's set the movie tab disabled
-        # self.ui.tw_shows_movies.setTabEnabled(0, False)
+        # self.tw_shows_movies.setTabEnabled(0, False)
 
-        self.ui.treeView.clicked.connect(self.on_treeview_click)
+        self.treeView.clicked.connect(self.on_treeview_click)
 
-        self.ui.plainTextEdit.setPlainText('API Key: ' + os.getenv('API_KEY'))
+        self.le_api_key.setText('API Key: ' + os.getenv('API_KEY'))
 
         self.taggermovie = TaggerMovie(key=os.getenv('API_KEY'))
         self.taggertv = TaggerTV(key=os.getenv('API_KEY'))
 
-        self.ui.listView.clicked.connect(self.on_listview_click)
-        self.ui.cb_options.currentTextChanged.connect(self.on_combobox_changed)
+        self.listView.clicked.connect(self.on_listview_click)
+        self.cb_options.currentTextChanged.connect(self.on_combobox_changed)
 
-        self.ui.lw_show_id_title.clicked.connect(self.on_show_id_title_click)
-        self.ui.lw_episode_title.itemChanged.connect(self.on_episode_title_check)
-        self.ui.lw_selected_files.itemChanged.connect(self.on_file_check)
+        self.lw_show_title.clicked.connect(self.on_show_title_click)
+        self.lw_episode_title.itemChanged.connect(self.on_episode_title_check)
+        self.lw_movie_title.itemChanged.connect(self.on_movie_title_check)
+        self.lw_selected_files.itemChanged.connect(self.on_file_check)
 
-        self.ui.pb_search.clicked.connect(self.on_search_click)
-        self.ui.pb_update.clicked.connect(self.on_update_click)
+        self.pb_search.clicked.connect(self.on_search_click)
+        self.pb_update.clicked.connect(self.on_update_click)
+
+        self.ckbx_select_all.stateChanged.connect(self.on_select_all_check)
+
+        # menu
+        # q
+        self.a_quit.triggered.connect(self.close)
+        # api key
+        self.a_api_key.triggered.connect(self.on_click_api_key)
+
+    def on_click_api_key(self):
+        api_key_dialog = Dialog()
+        api_key_dialog.exec_()
+
+        # save_api_key(api_key_dialog.)
+
+    def on_select_all_check(self, state):
+        """
+        Select all lw_selected_files or unselect all
+        :param state:
+        :return:
+        """
+        if state == Qt.Checked:
+            # get all QListWidgetItems
+            print(self.lw_selected_files.count())
+            for idx in range(0, self.lw_selected_files.count()):
+                item = self.lw_selected_files.item(idx)
+                item.setCheckState(Qt.Checked)
+        else:
+            for idx in range(0, self.lw_selected_files.count()):
+                item = self.lw_selected_files.item(idx)
+                item.setCheckState(Qt.Unchecked)
 
     def on_episode_title_check(self, item):
         """
@@ -108,6 +149,17 @@ class MainWindow(QMainWindow):
         if item.checkState() == Qt.Unchecked:
             self.checked_episode_titles.remove(item)
 
+    def on_movie_title_check(self, item):
+        """
+        Add / remove items from the lw_movie_title
+        :param item:
+        :return:
+        """
+        if item.checkState() == Qt.Checked:
+            self.checked_movie_titles.append(item)
+        if item.checkState() == Qt.Unchecked:
+            self.checked_movie_titles.remove(item)
+
     def on_file_check(self, item):
         """
         Add / remove items from the lw_episode_title
@@ -119,13 +171,15 @@ class MainWindow(QMainWindow):
         if item.checkState() == Qt.Unchecked:
             self.checked_files.remove(item)
 
-    def on_show_id_title_click(self, index):
+    def on_show_title_click(self, index):
         """
         Fills the episode titles listWidget.
         :param index:
         :return:
         """
-        self.ui.lw_episode_title.clear()
+        self.lw_episode_title.clear()
+        self.lw_episode_overviews.clear()
+        self.lw_episode_air_dates.clear()
 
         # need to make all items checkable
         for idx, title in enumerate(self.results[index.row()][2]):
@@ -133,78 +187,98 @@ class MainWindow(QMainWindow):
             item.setText('E{0} '.format(str(idx + 1).zfill(2)) + title)
             item.setFlags(item.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             item.setCheckState(Qt.Unchecked)
-            self.ui.lw_episode_title.addItem(item)
+            self.lw_episode_title.addItem(item)
 
-        # self.ui.lw_episode_title.addItems(self.results[index.row()][2])
-        self.ui.lw_episode_overviews.addItems(self.results[index.row()][4])
-        self.ui.lw_episode_air_dates.addItems(self.results[index.row()][3])
+        # self.lw_episode_title.addItems(self.results[index.row()][2])
+        self.lw_episode_overviews.addItems(self.results[index.row()][4])
+        self.lw_episode_air_dates.addItems(self.results[index.row()][3])
 
     def on_treeview_click(self, index):
-        self.path = self.ui.dirModel.fileInfo(index).absoluteFilePath()
+        self.path = self.dirModel.fileInfo(index).absoluteFilePath()
 
-        self.ui.listView.setRootIndex(self.ui.fileModel.setRootPath(self.path))
-        # self.ui.label.setText(self.ui.fileModel.fileName(self.ui.fileModel.index(index.row(), 0, index.parent())))
+        self.listView.setRootIndex(self.fileModel.setRootPath(self.path))
+        # self.label.setText(self.fileModel.fileName(self.fileModel.index(index.row(), 0, index.parent())))
 
     def on_listview_click(self):
-        self.ui.lw_selected_files.clear()
+        self.lw_selected_files.clear()
         self.checked_files = []
+        # self.checked_movie_titles = []
+        # self.checked_episode_titles = []
+        self.ckbx_select_all.setCheckState(Qt.Unchecked)
         # self.file_name = str(index.data())
-        # self.ui.pte_title.setPlainText(str(index.data()))
-        # self.ui.lw_selected_files.addItems([file.data() for file in self.ui.listView.selectedIndexes()])
+        # self.le_title.setPlainText(str(index.data()))
+        # self.lw_selected_files.addItems([file.data() for file in self.listView.selectedIndexes()])
 
         # need to make all items checkable
-        for file in self.ui.listView.selectedIndexes():
+        for file in self.listView.selectedIndexes():
             item = QListWidgetItem()
             item.setText(file.data())
             item.setFlags(item.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             item.setCheckState(Qt.Unchecked)
             # self.checked_files.append(item)
-            self.ui.lw_selected_files.addItem(item)
+            self.lw_selected_files.addItem(item)
 
     def on_search_click(self):
-        self.ui.lw_show_id_title.clear()
-        self.ui.lw_episode_title.clear()
-        self.ui.lw_episode_air_dates.clear()
-        self.ui.lw_episode_overviews.clear()
-        self.ui.lw_movie_title.clear()
-        self.ui.lw_movie_release_date.clear()
-        self.ui.lw_movie_overview.clear()
+        self.checked_episode_titles = []
+        self.checked_movie_titles = []
+        self.lw_show_id.clear()
+        self.lw_show_title.clear()
+        self.lw_episode_title.clear()
+        self.lw_episode_air_dates.clear()
+        self.lw_episode_overviews.clear()
+        self.lw_movie_id.clear()
+        self.lw_movie_title.clear()
+        self.lw_movie_release_date.clear()
+        self.lw_movie_overview.clear()
+        self.lw_movie_first_genre.clear()
 
-        if self.ui.cb_options.currentText() == 'Movie':
-            self.results = self.taggermovie.search_results(self.ui.pte_title.toPlainText())
-            self.ui.lw_movie_title.addItems([row[0] for row in self.results])
-            self.ui.lw_movie_release_date.addItems([row[1] for row in self.results])
-            self.ui.lw_movie_overview.addItems([row[2] for row in self.results])
+        if self.cb_options.currentText() == 'Movie':
+            self.results = self.taggermovie.search_results(self.le_title.text())
+            self.lw_movie_id.addItems([str(row[0]) for row in self.results])
+
+            # populate lw_movie_title with check boxes
+            for title in [row[1] for row in self.results]:
+                item = QListWidgetItem()
+                item.setText(title)
+                item.setFlags(item.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                item.setCheckState(Qt.Unchecked)
+                self.lw_movie_title.addItem(item)
+            self.lw_movie_release_date.addItems([row[2] for row in self.results])
+            self.lw_movie_overview.addItems([row[3] for row in self.results])
+            self.lw_movie_first_genre.addItems([row[4] for row in self.results])
         else:
-            if self.__is_number(self.ui.pte_season.toPlainText()):
+            if self.__is_number(self.le_season.text()):
                 self.results = self.taggertv.search_results(
-                    self.ui.pte_title.toPlainText(),
-                    int(self.ui.pte_season.toPlainText())
+                    self.le_title.text(),
+                    int(self.le_season.text())
                 )
-                self.ui.lw_show_id_title.addItems([row[1] + ' (' + str(row[0]) + ')' for row in self.results])
+                self.lw_show_id.addItems([str(row[0]) for row in self.results])
+                self.lw_show_title.addItems([row[1] for row in self.results])
 
     def on_combobox_changed(self, value):
         if value == 'Movie':
-            self.ui.tw_shows_movies.setCurrentIndex(0)
-            self.ui.pte_season.setReadOnly(True)
-            # self.ui.tw_shows_movies.setTabEnabled(1, False)
+            self.tw_shows_movies.setCurrentIndex(0)
+            self.le_season.setDisabled(True)
+            # self.tw_shows_movies.setTabEnabled(1, False)
         else:
-            self.ui.tw_shows_movies.setCurrentIndex(1)
-            self.ui.pte_season.setReadOnly(False)
-            # self.ui.tw_shows_movies.setTabEnabled(0, False)
+            self.tw_shows_movies.setCurrentIndex(1)
+            self.le_season.setDisabled(False)
+            # self.tw_shows_movies.setTabEnabled(0, False)
 
     def on_update_click(self):
-        if self.ui.cb_options.currentText() == 'TV Show':
-            if len(self.checked_files) == len(self.checked_episode_titles) and self.checked_files != [] and self.checked_episode_titles != []:
-                # checked_episode_titles = self.ui.lw_episode_title.selectedItems()
-                checked_episodes_titles_idx = [self.ui.lw_episode_title.row(t) for t in self.checked_episode_titles]
+        print(len(self.checked_files), len(self.checked_episode_titles))
+        if self.cb_options.currentText() == 'TV Show':
+            if len(self.checked_files) == len(
+                    self.checked_episode_titles) and self.checked_files != [] and self.checked_episode_titles != []:
+                # checked_episode_titles = self.lw_episode_title.selectedItems()
+                checked_episodes_titles_idx = [self.lw_episode_title.row(t) for t in self.checked_episode_titles]
 
-                selected_show_id_row = self.ui.lw_show_id_title.row(self.ui.lw_show_id_title.selectedItems()[0])
+                selected_show_id_row = self.lw_show_title.row(self.lw_show_title.selectedItems()[0])
                 selected_show_id = self.results[selected_show_id_row]
 
                 # for idx in range(0, checked_episodes_idx):
                 for i, idx in enumerate(checked_episodes_titles_idx):
-                    item = self.ui.lw_selected_files.item(i)
+                    item = self.lw_selected_files.item(i)
                     file_w_path = (self.path + '/' + item.text())
 
                     episode_title = selected_show_id[2][idx]
@@ -216,7 +290,7 @@ class MainWindow(QMainWindow):
                     season = '{0}'.format(str(selected_show_id[7]).zfill(2))
                     episode = '{0}'.format(str(idx + 1).zfill(2))
 
-                    print(i, item.text(), idx+1, episode_title)
+                    print(i, item.text(), idx + 1, episode_title)
 
                     if os.path.isfile(file_w_path):
                         subprocess.call(
@@ -232,10 +306,41 @@ class MainWindow(QMainWindow):
                                   self.path + '/' + show + ' S' + season + 'E' + episode +
                                   os.path.splitext(item.text())[1].lower())
 
-                        # self.ui.lw_selected_files.removeItemWidget(item)
+                        # self.lw_selected_files.removeItemWidget(item)
+        else:
+            if len(self.checked_files) == len(
+                    self.checked_movie_titles) and self.checked_files != [] and self.checked_movie_titles != []:
+                checked_movie_title_row = [self.lw_movie_title.row(t) for t in self.checked_movie_titles]
+
+                for i, idx in enumerate(checked_movie_title_row):
+                    selected_movie_id = self.results[idx]
+
+                    item = self.lw_selected_files.item(i)
+                    file_w_path = (self.path + '/' + item.text())
+
+                    movie_title = selected_movie_id[1].replace(':', ' - ')
+                    movie_release_date = selected_movie_id[2]
+                    movie_overview = selected_movie_id[3]
+                    movie_first_genre = selected_movie_id[4]
+
+                    print(movie_title)
+                    if os.path.isfile(file_w_path):
+                        subprocess.call(
+                            ["AtomicParsley", file_w_path, "--overWrite", "--title", movie_title, "--desc",
+                             movie_overview,
+                             "--longdesc", movie_overview, "--year", movie_release_date, "--genre", movie_first_genre,
+                             "--hdvideo", "true", "--stik", "Movie"])
+
+                        if self.rb_3d.isChecked():
+                            os.rename(file_w_path,
+                                      self.path + '/' + movie_title + ' ' + movie_release_date + ' - 3D' +
+                                      os.path.splitext(item.text())[1].lower())
+                        else:
+                            os.rename(file_w_path,
+                                      self.path + '/' + movie_title + ' ' + movie_release_date +
+                                      os.path.splitext(item.text())[1].lower())
 
         print('Completed task')
-        print('Debug: ', len(self.checked_files), len(self.checked_files))
 
     @staticmethod
     def __is_number(s):
@@ -258,13 +363,6 @@ class MainWindow(QMainWindow):
 
         return False
 
-    @pyqtSlot(int)
-    def __updateProgressBar(self, percent):
-        self.progress.setValue(percent)
-
-    def start(self):
-        self.progressView.start()
-
 
 class Tagger(object):
     def __init__(self, key, language='en'):
@@ -283,7 +381,35 @@ class TaggerMovie(Tagger):
         return dict([(g.id, g.name) for g in self.genres])
 
     def search_results(self, title):
-        return [[item.title, item.release_date.split('-')[0], item.overview] for item in self.movie.search(title)]
+        """
+        Search results for a movie
+        :param title:
+        :return: Returns an array that contains id, title, release date, overview, and first genre.
+        """
+        g = self.__get_genres()
+        arr = []
+
+        for item in self.movie.search(title):
+            title = item.title
+
+            try:
+                release_date = item.release_date.split('-')[0]
+            except IndexError:
+                release_date = ''
+
+            try:
+                overview = item.overview
+            except IndexError:
+                overview = ''
+
+            try:
+                first_genre = g[item.genre_ids[0]]
+            except IndexError:
+                first_genre = ''
+
+            arr.append([item.id, title, release_date, item.overview, first_genre])
+
+        return arr
 
 
 class TaggerTV(Tagger):
