@@ -50,10 +50,10 @@ class Dialog(QDialog, ui.Ui_Dialog):
 # MainWindow Class
 class MainWindow(QMainWindow, ui.Ui_MainWindow):
     def __init__(self, parent=None):
-        # super().__init__()
         QMainWindow.__init__(self, parent)
         self.setupUi(self)
 
+        # default values
         self.results = None
         self.file_name = None
         self.path = None
@@ -61,9 +61,6 @@ class MainWindow(QMainWindow, ui.Ui_MainWindow):
         self.checked_episode_titles = []
         self.checked_movie_titles = []
         self.checked_files = []
-
-        # self.= Ui_MainWindow()
-        # self.setupUi(self)
 
         # setup directories and files
         path = QDir.homePath()
