@@ -7,6 +7,12 @@ class Tagger(object):
         self.tmdb.api_key = key
         self.tmdb.language = language
 
+    def get_api_key(self) -> str:
+        return self.tmdb.api_key
+
+    def get_language(self) -> str:
+        return self.tmdb.language
+
 
 class TaggerMovie(Tagger):
     def __init__(self, key, language='en'):
@@ -14,7 +20,7 @@ class TaggerMovie(Tagger):
         self.movie = Movie()
         self.genres = Genre().movie_list()
 
-    def __get_genres(self):
+    def get_genres(self):
         return dict([(g.id, g.name) for g in self.genres])
 
     def search_results(self, title):
@@ -23,7 +29,7 @@ class TaggerMovie(Tagger):
         :param title:
         :return: Returns an array that contains id, title, release date, overview, and first genre.
         """
-        g = self.__get_genres()
+        g = self.get_genres()
         arr = []
 
         for item in self.movie.search(title):
