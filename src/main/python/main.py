@@ -1,17 +1,17 @@
 from fbs_runtime.application_context import ApplicationContext, cached_property
-from PyQt5.QtWidgets import QMainWindow, QFileSystemModel, QHeaderView, QListWidgetItem, QDialog
+from PyQt5.QtWidgets import QMainWindow, QFileSystemModel, QHeaderView, QListWidgetItem
 from PyQt5.QtCore import QDir, Qt
 
 import sys
 import os
-import ui
+import src.main.python.ui as ui
 from src.main.python.dialogs import Dialog
 from src.main.python.tagger import TaggerTV, TaggerMovie
+from src.main.python.tagging import MovieMetaTag, ShowMetaTag
 
 import subprocess
-from dotenv import load_dotenv
 
-load_dotenv()
+API_KEY = os.path.join(os.path.dirname(__file__), '.api_key')
 
 
 class AppContext(ApplicationContext):
@@ -67,10 +67,7 @@ class MainWindow(QMainWindow, ui.Ui_MainWindow):
 
         self.treeView.clicked.connect(self.on_treeview_click)
 
-        self.le_api_key.setText('API Key: ' + os.getenv('API_KEY'))
-
-        self.taggermovie = TaggerMovie(key=os.getenv('API_KEY'))
-        self.taggertv = TaggerTV(key=os.getenv('API_KEY'))
+        # self.le_api_key.setText('API Key: ' + os.getenv('API_KEY'))
 
         self.listView.clicked.connect(self.on_listview_click)
         self.cb_options.currentTextChanged.connect(self.on_combobox_changed)
@@ -84,18 +81,38 @@ class MainWindow(QMainWindow, ui.Ui_MainWindow):
         self.pb_update.clicked.connect(self.on_update_click)
 
         self.ckbx_select_all.stateChanged.connect(self.on_select_all_check)
+        self.hs_connection.valueChanged.connect(self.on_slide_connect_tmdb)
 
         # menu
         # q
         self.a_quit.triggered.connect(self.close)
         # api key
         self.a_api_key.triggered.connect(self.on_click_api_key)
+        self.a_connect_tmdb.triggered.connect(self.on_click_connect_tmdb)
 
     def on_click_api_key(self):
         api_key_dialog = Dialog()
         api_key_dialog.exec_()
 
+        self.api_key_file = open(API_KEY)
+        self.le_api_key.setText(self.api_key_file.read())
+        self.api_key_file.close()
+
         # save_api_key(api_key_dialog.)
+
+    def on_click_connect_tmdb(self):
+        self.taggermovie = TaggerMovie(key=self.le_api_key.text())
+        self.taggertv = TaggerTV(key=self.le_api_key.text())
+        self.hs_connection.setValue(1)
+        self.l_connection.setText('Connected')
+
+    def on_slide_connect_tmdb(self):
+        if self.hs_connection.value() == 1 and self.le_api_key.text() != '':
+            self.taggermovie = TaggerMovie(key=self.le_api_key.text())
+            self.taggertv = TaggerTV(key=self.le_api_key.text())
+            self.l_connection.setText('Connected')
+        else:
+            self.l_connection.setText('Disconnected')
 
     def on_select_all_check(self, state):
         """
@@ -269,14 +286,20 @@ class MainWindow(QMainWindow, ui.Ui_MainWindow):
                     print(i, item.text(), idx + 1, episode_title)
 
                     if os.path.isfile(file_w_path):
-                        subprocess.call(
-                            ["AtomicParsley", file_w_path, "--overWrite", "--TVShowName", show,
-                             "--TVSeasonNum", season, "--TVEpisodeNum", episode, "--title", episode_title,
-                             "--TVNetwork",
-                             network, "--desc", episode_overview, "--longdesc", episode_overview,
-                             "--year", episode_air_date,
-                             "--genre", episode_first_genre, "--track", episode, "--disk", season, "--hdvideo",
-                             "true", "--stik", "TV Show"])
+                        # subprocess.call(
+                        #     ["AtomicParsley", file_w_path, "--overWrite", "--TVShowName", show,
+                        #      "--TVSeasonNum", season, "--TVEpisodeNum", episode, "--title", episode_title,
+                        #      "--TVNetwork",
+                        #      network, "--desc", episode_overview, "--longdesc", episode_overview,
+                        #      "--year", episode_air_date,
+                        #      "--genre", episode_first_genre, "--track", episode, "--disk", season, "--hdvideo",
+                        #      "true", "--stik", "TV Show"])
+                        # TODO: no need for ldes/desc
+                        t = ShowMetaTag(file=file_w_path, nam=episode_title, desc=episode_overview,
+                                        ldes=episode_overview,
+                                        gen=episode_first_genre, day=episode_air_date, tvnn=network, tvsh=show,
+                                        tves=int(episode), tvsn=int(season), trkn=int(episode), disk=int(season))
+                        t.save_meta_tags()
 
                         os.rename(file_w_path,
                                   self.path + '/' + show + ' S' + season + 'E' + episode +
@@ -299,13 +322,17 @@ class MainWindow(QMainWindow, ui.Ui_MainWindow):
                     movie_overview = selected_movie_id[3]
                     movie_first_genre = selected_movie_id[4]
 
-                    print(movie_title)
                     if os.path.isfile(file_w_path):
-                        subprocess.call(
-                            ["AtomicParsley", file_w_path, "--overWrite", "--title", movie_title, "--desc",
-                             movie_overview,
-                             "--longdesc", movie_overview, "--year", movie_release_date, "--genre", movie_first_genre,
-                             "--hdvideo", "true", "--stik", "Movie"])
+                        # subprocess.call(
+                        #     ["AtomicParsley", file_w_path, "--overWrite", "--title", movie_title, "--desc",
+                        #      movie_overview,
+                        #      "--longdesc", movie_overview, "--year", movie_release_date, "--genre", movie_first_genre,
+                        #      "--hdvideo", "true", "--stik", "Movie"])
+
+                        # TODO: no need for ldes/desc
+                        t = MovieMetaTag(file=file_w_path, nam=movie_title, desc=movie_overview, ldes=movie_overview,
+                                         gen=movie_first_genre, day=movie_release_date)
+                        t.save_meta_tags()
 
                         if self.rb_3d.isChecked():
                             os.rename(file_w_path,
