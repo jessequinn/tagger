@@ -2,6 +2,9 @@ from tmdbv3api import TMDb, Movie, Genre, TV, Season
 
 
 class Tagger(object):
+    """
+    Base Class Tagger contains TMDB() instance, language, and key
+    """
     def __init__(self, key, language='en'):
         self.tmdb = TMDb()
         self.tmdb.api_key = key
@@ -20,7 +23,7 @@ class TaggerMovie(Tagger):
         self.movie = Movie()
         self.genres = Genre().movie_list()
 
-    def get_genres(self):
+    def get_genres(self) -> dict:
         return dict([(g.id, g.name) for g in self.genres])
 
     def search_results(self, title):
@@ -50,7 +53,7 @@ class TaggerMovie(Tagger):
             except IndexError:
                 first_genre = ''
 
-            arr.append([item.id, title, release_date, item.overview, first_genre])
+            arr.append([item.id, title, release_date, overview, first_genre])
 
         return arr
 

@@ -5,7 +5,8 @@ from PyQt5.QtCore import QDir, Qt
 import sys
 import os
 import ui
-from tagger import TaggerTV, TaggerMovie
+from src.main.python.dialogs import Dialog
+from src.main.python.tagger import TaggerTV, TaggerMovie
 
 import subprocess
 from dotenv import load_dotenv
@@ -23,26 +24,6 @@ class AppContext(ApplicationContext):
     @cached_property
     def window(self):
         return MainWindow()
-
-
-# API Dialog Class
-# TODO: refactor
-class Dialog(QDialog, ui.Ui_Dialog):
-    def __init__(self, parent=None):
-        QDialog.__init__(self, parent)
-        self.setupUi(self)
-        self.btn_bx_api_key.accepted.connect(self.save_api_key)
-        self.btn_bx_api_key.rejected.connect(self.rejected)
-
-    def save_api_key(self, f='.api_key'):
-        try:
-            with open(f, 'w') as the_file:
-                the_file.write('{0}'.format(self.pte_api_key.text()))
-        except EnvironmentError:
-            # TODO: new error message
-            print('error with file write')
-            self.rejected()
-        self.accept()
 
 
 # MainWindow Class
