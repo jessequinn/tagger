@@ -264,6 +264,7 @@ class MainWindow(QMainWindow, ui.Ui_MainWindow):
             if len(self.checked_files) == len(
                     self.checked_episode_titles) and self.checked_files != [] and self.checked_episode_titles != []:
                 # checked_episode_titles = self.lw_episode_title.selectedItems()
+                self.prgbar_update.setMaximum(len(self.checked_files))
                 checked_episodes_titles_idx = [self.lw_episode_title.row(t) for t in self.checked_episode_titles]
 
                 selected_show_id_row = self.lw_show_title.row(self.lw_show_title.selectedItems()[0])
@@ -304,6 +305,8 @@ class MainWindow(QMainWindow, ui.Ui_MainWindow):
                         os.rename(file_w_path,
                                   self.path + '/' + show + ' S' + season + 'E' + episode +
                                   os.path.splitext(item.text())[1].lower())
+
+                        self.prgbar_update.setValue(i+1)
 
                         # self.lw_selected_files.removeItemWidget(item)
         else:

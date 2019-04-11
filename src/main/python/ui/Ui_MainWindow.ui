@@ -64,9 +64,9 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>460</y>
+      <y>430</y>
       <width>1311</width>
-      <height>571</height>
+      <height>601</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -307,7 +307,7 @@
         <x>10</x>
         <y>10</y>
         <width>1281</width>
-        <height>521</height>
+        <height>541</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_4">
@@ -465,8 +465,8 @@
      <rect>
       <x>20</x>
       <y>380</y>
-      <width>1406</width>
-      <height>74</height>
+      <width>1471</width>
+      <height>41</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -475,13 +475,13 @@
        <property name="minimumSize">
         <size>
          <width>100</width>
-         <height>0</height>
+         <height>31</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>100</width>
-         <height>16777215</height>
+         <height>31</height>
         </size>
        </property>
        <property name="text">
@@ -494,6 +494,18 @@
      </item>
      <item>
       <widget class="QLineEdit" name="le_title">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>31</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>31</height>
+        </size>
+       </property>
        <property name="text">
         <string>Game of thrones</string>
        </property>
@@ -506,13 +518,13 @@
          <property name="minimumSize">
           <size>
            <width>100</width>
-           <height>0</height>
+           <height>31</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>100</width>
-           <height>16777215</height>
+           <height>31</height>
           </size>
          </property>
          <property name="frameShadow">
@@ -528,6 +540,18 @@
        </item>
        <item>
         <widget class="QLineEdit" name="le_season">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>31</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>31</height>
+          </size>
+         </property>
          <property name="text">
           <string>1</string>
          </property>
@@ -553,31 +577,26 @@
          </item>
         </widget>
        </item>
+       <item>
+        <widget class="Line" name="line">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pb_search">
+         <property name="text">
+          <string>Search</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="verticalLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>1800</x>
-      <y>380</y>
-      <width>92</width>
-      <height>72</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QPushButton" name="pb_search">
+      <widget class="QPushButton" name="pb_clear">
        <property name="text">
-        <string>Search</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pb_update">
-       <property name="text">
-        <string>Update</string>
+        <string>Clear</string>
        </property>
       </widget>
      </item>
@@ -587,9 +606,9 @@
     <property name="geometry">
      <rect>
       <x>1400</x>
-      <y>490</y>
+      <y>460</y>
       <width>471</width>
-      <height>531</height>
+      <height>411</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_3">
@@ -655,6 +674,24 @@
        </item>
       </layout>
      </item>
+     <item row="3" column="2">
+      <layout class="QGridLayout" name="gridLayout_5">
+       <item row="0" column="0">
+        <widget class="QProgressBar" name="prgbar_update">
+         <property name="value">
+          <number>0</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QPushButton" name="pb_update">
+         <property name="text">
+          <string>Update</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
     </layout>
    </widget>
    <widget class="QWidget" name="gridLayoutWidget_4">
@@ -663,11 +700,11 @@
       <x>20</x>
       <y>10</y>
       <width>1871</width>
-      <height>31</height>
+      <height>33</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="1">
+     <item row="0" column="2">
       <widget class="QLabel" name="l_connection">
        <property name="text">
         <string>Disconnected</string>
@@ -677,7 +714,7 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="2">
+     <item row="0" column="3">
       <widget class="QSlider" name="hs_connection">
        <property name="minimumSize">
         <size>
@@ -699,19 +736,41 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="0">
+     <item row="0" column="1">
       <widget class="QLineEdit" name="le_api_key">
        <property name="minimumSize">
         <size>
          <width>400</width>
-         <height>0</height>
+         <height>31</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>400</width>
-         <height>16777215</height>
+         <height>31</height>
         </size>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_14">
+       <property name="minimumSize">
+        <size>
+         <width>50</width>
+         <height>31</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>50</width>
+         <height>31</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>API Key</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
