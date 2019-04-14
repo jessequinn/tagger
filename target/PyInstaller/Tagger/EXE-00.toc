@@ -34,7 +34,7 @@
    '/home/jessequinn/.pyenv/versions/3.6.8/envs/tagger-3.6.8/lib/python3.6/site-packages/PyInstaller/loader/pyiboot01_bootstrap.py',
    'PYSOURCE'),
   ('fbs_pyinstaller_hook',
-   '/tmp/tmpm5fbptf2/fbs_pyinstaller_hook.py',
+   '/tmp/tmpudaelbhq/fbs_pyinstaller_hook.py',
    'PYSOURCE'),
   ('pyi_rth_qt5',
    '/home/jessequinn/.pyenv/versions/3.6.8/envs/tagger-3.6.8/lib/python3.6/site-packages/PyInstaller/loader/rthooks/pyi_rth_qt5.py',
@@ -45,7 +45,7 @@
  [],
  False,
  False,
- 1554984270,
+ 1555245981,
  [('run',
    '/home/jessequinn/.pyenv/versions/3.6.8/envs/tagger-3.6.8/lib/python3.6/site-packages/PyInstaller/bootloader/Linux-64bit/run',
    'EXECUTABLE')])
