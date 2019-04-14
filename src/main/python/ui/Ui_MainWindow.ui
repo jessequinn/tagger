@@ -70,11 +70,11 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="t_movie">
      <attribute name="title">
-      <string>Movie</string>
+      <string>Film</string>
      </attribute>
      <widget class="QWidget" name="gridLayoutWidget">
       <property name="geometry">
@@ -119,13 +119,13 @@
          <property name="minimumSize">
           <size>
            <width>100</width>
-           <height>0</height>
+           <height>31</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>100</width>
-           <height>16777215</height>
+           <height>31</height>
           </size>
          </property>
          <property name="text">
@@ -141,17 +141,17 @@
          <property name="minimumSize">
           <size>
            <width>100</width>
-           <height>0</height>
+           <height>31</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>100</width>
-           <height>16777215</height>
+           <height>31</height>
           </size>
          </property>
          <property name="text">
-          <string>Genre</string>
+          <string>Genres</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -163,13 +163,13 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>0</height>
+           <height>31</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>16777215</height>
+           <height>31</height>
           </size>
          </property>
          <property name="text">
@@ -213,7 +213,7 @@
         </widget>
        </item>
        <item row="1" column="7">
-        <widget class="QListWidget" name="lw_movie_first_genre">
+        <widget class="QListWidget" name="lw_movie_genres">
          <property name="minimumSize">
           <size>
            <width>100</width>
@@ -252,17 +252,17 @@
          <property name="minimumSize">
           <size>
            <width>500</width>
-           <height>0</height>
+           <height>31</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>500</width>
-           <height>16777215</height>
+           <height>31</height>
           </size>
          </property>
          <property name="text">
-          <string>Movie Title</string>
+          <string>Film</string>
          </property>
          <property name="textFormat">
           <enum>Qt::PlainText</enum>
@@ -277,13 +277,13 @@
          <property name="minimumSize">
           <size>
            <width>100</width>
-           <height>0</height>
+           <height>31</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>100</width>
-           <height>16777215</height>
+           <height>31</height>
           </size>
          </property>
          <property name="text">
@@ -299,7 +299,7 @@
     </widget>
     <widget class="QWidget" name="t_tvshow">
      <attribute name="title">
-      <string>Shows</string>
+      <string>Show</string>
      </attribute>
      <widget class="QWidget" name="gridLayoutWidget_3">
       <property name="geometry">
@@ -329,10 +329,16 @@
        </item>
        <item row="0" column="7">
         <widget class="QLabel" name="label">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>31</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>100</width>
-           <height>16777215</height>
+           <height>31</height>
           </size>
          </property>
          <property name="text">
@@ -345,14 +351,20 @@
        </item>
        <item row="0" column="1">
         <widget class="QLabel" name="label_3">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>31</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>300</width>
-           <height>16777215</height>
+           <height>31</height>
           </size>
          </property>
          <property name="text">
-          <string>Show Name</string>
+          <string>Show</string>
          </property>
          <property name="textFormat">
           <enum>Qt::PlainText</enum>
@@ -364,10 +376,16 @@
        </item>
        <item row="0" column="3">
         <widget class="QLabel" name="label_5">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>31</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>600</width>
-           <height>16777215</height>
+           <height>31</height>
           </size>
          </property>
          <property name="text">
@@ -419,6 +437,18 @@
        </item>
        <item row="0" column="0">
         <widget class="QLabel" name="label_13">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>31</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>31</height>
+          </size>
+         </property>
          <property name="text">
           <string>ID</string>
          </property>
@@ -442,10 +472,16 @@
        </item>
        <item row="0" column="2">
         <widget class="QLabel" name="label_2">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>31</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>600</width>
-           <height>16777215</height>
+           <height>31</height>
           </size>
          </property>
          <property name="text">
@@ -559,33 +595,60 @@
        </item>
        <item>
         <widget class="QComboBox" name="cb_options">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>31</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>100</width>
            <height>31</height>
           </size>
          </property>
+         <property name="currentText">
+          <string>Show</string>
+         </property>
          <item>
           <property name="text">
-           <string>TV Show</string>
+           <string>Show</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>Movie</string>
+           <string>Film</string>
           </property>
          </item>
         </widget>
        </item>
        <item>
-        <widget class="Line" name="line">
+        <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-        </widget>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
        <item>
         <widget class="QPushButton" name="pb_search">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>31</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>31</height>
+          </size>
+         </property>
          <property name="text">
           <string>Search</string>
          </property>
@@ -595,6 +658,18 @@
      </item>
      <item>
       <widget class="QPushButton" name="pb_clear">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>31</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>31</height>
+        </size>
+       </property>
        <property name="text">
         <string>Clear</string>
        </property>
@@ -608,7 +683,7 @@
       <x>1400</x>
       <y>460</y>
       <width>471</width>
-      <height>411</height>
+      <height>481</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_3">
@@ -632,6 +707,18 @@
       <layout class="QGridLayout" name="gridLayout_6">
        <item row="0" column="0">
         <widget class="QCheckBox" name="ckbx_select_all">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>31</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>31</height>
+          </size>
+         </property>
          <property name="text">
           <string>Select All</string>
          </property>
@@ -639,10 +726,16 @@
        </item>
        <item row="0" column="1">
         <widget class="QLabel" name="label_4">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>31</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>600</width>
-           <height>16777215</height>
+           <height>31</height>
           </size>
          </property>
          <property name="text">
@@ -658,13 +751,13 @@
          <property name="minimumSize">
           <size>
            <width>60</width>
-           <height>0</height>
+           <height>31</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>60</width>
-           <height>16777215</height>
+           <height>31</height>
           </size>
          </property>
          <property name="text">
@@ -674,10 +767,22 @@
        </item>
       </layout>
      </item>
-     <item row="3" column="2">
+     <item row="4" column="2">
       <layout class="QGridLayout" name="gridLayout_5">
        <item row="0" column="0">
         <widget class="QProgressBar" name="prgbar_update">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>31</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>31</height>
+          </size>
+         </property>
          <property name="value">
           <number>0</number>
          </property>
@@ -685,12 +790,37 @@
        </item>
        <item row="0" column="1">
         <widget class="QPushButton" name="pb_update">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>31</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>31</height>
+          </size>
+         </property>
          <property name="text">
           <string>Update</string>
          </property>
         </widget>
        </item>
       </layout>
+     </item>
+     <item row="3" column="2">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </widget>
@@ -719,13 +849,13 @@
        <property name="minimumSize">
         <size>
          <width>50</width>
-         <height>0</height>
+         <height>31</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>50</width>
-         <height>16777215</height>
+         <height>31</height>
         </size>
        </property>
        <property name="maximum">

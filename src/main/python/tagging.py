@@ -10,7 +10,7 @@ class MetaTag(object):
 
     def delete_meta_tags(self):
         """
-        Preserver encoding tool info.
+        Preserve encoding tool info.
         :return:
         """
         encoding_tool = self.meta_tag['\xa9too']
@@ -24,13 +24,13 @@ class MetaTag(object):
 class MovieMetaTag(MetaTag):
     def __init__(self, file, nam, desc, ldes, day, gen):
         """
-
-        :param file:
-        :param nam:
-        :param des:
-        :param ldes:
-        :param day:
-        :param gen:
+        Class specific for Movie meta tagging.
+        :param file: File path and file name to be read by Mutagen
+        :param nam: Movie title
+        :param desc: Description
+        :param ldes: Description
+        :param day: Date
+        :param gen: Genre
         """
         MetaTag.__init__(self, file)
 
@@ -47,19 +47,19 @@ class MovieMetaTag(MetaTag):
 class ShowMetaTag(MetaTag):
     def __init__(self, file, nam, tvsh, tvsn, tves, tvnn, desc, ldes, day, gen, trkn, disk):
         """
-
-        :param file:
-        :param nam:
-        :param tvsh:
-        :param tvsn:
-        :param tves:
-        :param tvnn:
-        :param desc:
-        :param ldesc:
-        :param day:
-        :param gen:
-        :param trkn:
-        :param disk:
+        Class specific for Show meta tagging.
+        :param file: File path and file name to be read by Mutagen
+        :param nam: Episode title
+        :param tvsh: Show title
+        :param tvsn: Season #
+        :param tves: Episode #
+        :param tvnn: Network
+        :param desc: Description
+        :param ldes: Description
+        :param day: Date
+        :param gen: Genre
+        :param trkn: Track # (Episode #)
+        :param disk: Disk # (Season #)
         """
         MetaTag.__init__(self, file)
 
