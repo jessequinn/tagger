@@ -9,3 +9,5 @@ The App is functional for both movie and tv show tagging. Currently, I am workin
 #### Operation
 Simply run
     ./target/Tagger/Tagger 
+
+![screenshot](Screenshot.png)
