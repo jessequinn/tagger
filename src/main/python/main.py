@@ -86,6 +86,9 @@ class MainWindow(QMainWindow, ui.Ui_MainWindow):
         self.hs_connection.valueChanged.connect(self.on_slide_connect_tmdb)
 
         self.pb_clear.clicked.connect(self.on_pb_clear_click)
+        self.pb_connect.clicked.connect(self.on_click_connect_tmdb)
+
+        self.tw_shows_movies.setCurrentIndex(1)
 
         # menu
         # q
@@ -247,11 +250,9 @@ class MainWindow(QMainWindow, ui.Ui_MainWindow):
         if value == 'Film':
             self.tw_shows_movies.setCurrentIndex(0)
             self.le_season.setDisabled(True)
-            # self.tw_shows_movies.setTabEnabled(1, False)
         else:
             self.tw_shows_movies.setCurrentIndex(1)
             self.le_season.setDisabled(False)
-            # self.tw_shows_movies.setTabEnabled(0, False)
 
     def on_update_click(self):
         if self.cb_options.currentText() == 'Show':
@@ -320,7 +321,7 @@ class MainWindow(QMainWindow, ui.Ui_MainWindow):
                                       os.path.splitext(item.text())[1].lower())
                         else:
                             os.rename(file_w_path,
-                                      self.path + '/' + movie_title + ' ' + movie_release_date +
+                                      self.path + '/' + movie_title + ' ' + movie_release_date[:4] +
                                       os.path.splitext(item.text())[1].lower())
                         self.prgbar_update.setValue(i + 1)
 
