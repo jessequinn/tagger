@@ -108,7 +108,6 @@ class TV(Search):
             arr = []
 
             for show in shows_found.json()['results']:
-
                 payload = {
                     'api_key': self.api_key,
                     'language': self.language
@@ -205,7 +204,6 @@ class Movie(Search):
             arr = []
 
             for movie in movies_found.json()['results']:
-
                 payload = {'api_key': self.api_key, 'language': self.language}
                 movie_details_found = requests.get(self.URL + 'movie/' + str(movie['id']), payload)
 
