@@ -6,3 +6,4 @@ processed/
 *.m4v
 .api_key
 .coverage
+!SampleVideo_1280x720_1mb.mp4

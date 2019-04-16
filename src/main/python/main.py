@@ -7,7 +7,7 @@ import re
 import os
 import src.main.python.ui as ui
 from src.main.python.dialogs import Dialog
-from src.main.python.tagging import MovieMetaTag, ShowMetaTag
+from src.main.python.tagging import FilmMetaTag, ShowMetaTag
 from src.main.python.search import TV, Movie
 
 import subprocess
@@ -224,7 +224,13 @@ class MainWindow(QMainWindow, ui.Ui_MainWindow):
         self.lw_movie_genres.clear()
 
         if self.cb_options.currentText() == 'Film':
-            self.results = self.movie.search_movie(self.le_title.text())
+            # set properties
+            self.movie.query = self.le_title.text()
+
+            # search above properties
+            self.results = self.movie.search_movie()
+
+            # fill list widgets
             self.lw_movie_id.addItems([str(row[0]) for row in self.results])
 
             # populate lw_movie_title with check boxes
@@ -239,10 +245,14 @@ class MainWindow(QMainWindow, ui.Ui_MainWindow):
             self.lw_movie_genres.addItems([re.sub("\'", '', str(row[4]).strip('[]')) for row in self.results])
         else:
             if self.__is_number(self.le_season.text()):
-                self.results = self.tv.search_tv_show(
-                    query=self.le_title.text(),
-                    season=int(self.le_season.text())
-                )
+                # set properties
+                self.tv.query = self.le_title.text()
+                self.tv.season = int(self.le_season.text())
+
+                # search above properties
+                self.results = self.tv.search_tv_show()
+
+                # fill list widgets
                 self.lw_show_id.addItems([str(row[0]) for row in self.results])
                 self.lw_show_title.addItems([row[1] for row in self.results])
 
@@ -258,14 +268,12 @@ class MainWindow(QMainWindow, ui.Ui_MainWindow):
         if self.cb_options.currentText() == 'Show':
             if len(self.checked_files) == len(
                     self.checked_episode_titles) and self.checked_files != [] and self.checked_episode_titles != []:
-                # checked_episode_titles = self.lw_episode_title.selectedItems()
                 self.prgbar_update.setMaximum(len(self.checked_files))
                 checked_episodes_titles_idx = [self.lw_episode_title.row(t) for t in self.checked_episode_titles]
 
                 selected_show_id_row = self.lw_show_title.row(self.lw_show_title.selectedItems()[0])
                 selected_show_id = self.results[selected_show_id_row]
 
-                # for idx in range(0, checked_episodes_idx):
                 for i, idx in enumerate(checked_episodes_titles_idx):
                     item = self.lw_selected_files.item(i)
                     file_w_path = (self.path + '/' + item.text())
@@ -281,11 +289,24 @@ class MainWindow(QMainWindow, ui.Ui_MainWindow):
 
                     if os.path.isfile(file_w_path):
                         # TODO: no need for ldes/desc
-                        t = ShowMetaTag(file=file_w_path, nam=episode_title, desc=episode_overview,
-                                        ldes=episode_overview,
-                                        gen=episode_first_genre, day=episode_air_date, tvnn=network, tvsh=show,
-                                        tves=int(episode), tvsn=int(season), trkn=int(episode), disk=int(season))
-                        t.save_meta_tags()
+                        # setup instance of ShowMetaTag
+                        s = ShowMetaTag(file=file_w_path)
+
+                        # delete tags
+                        s.delete_meta_tags()
+
+                        # set properties
+                        s.set_episode_title(episode_title)
+                        s.set_genre(episode_first_genre)
+                        s.set_date(episode_air_date)
+                        s.set_description(episode_overview)
+                        s.set_network(network)
+                        s.set_show_title(show)
+                        s.set_episode(int(episode))
+                        s.set_season(int(season))
+
+                        # save tags
+                        s.save_meta_tags()
 
                         os.rename(file_w_path,
                                   self.path + '/' + show + ' S' + season + 'E' + episode +
@@ -311,9 +332,20 @@ class MainWindow(QMainWindow, ui.Ui_MainWindow):
 
                     if os.path.isfile(file_w_path):
                         # TODO: no need for ldes/desc
-                        t = MovieMetaTag(file=file_w_path, nam=movie_title, desc=movie_overview, ldes=movie_overview,
-                                         gen=movie_first_genre, day=movie_release_date)
-                        t.save_meta_tags()
+                        # setup instance of FilmMetaTag
+                        f = FilmMetaTag(file=file_w_path)
+
+                        # delete tags
+                        f.delete_meta_tags()
+
+                        # set properties
+                        f.set_title(movie_title)
+                        f.set_description(movie_overview)
+                        f.set_date(movie_release_date)
+                        f.set_genre(movie_first_genre)
+
+                        # save tags
+                        f.save_meta_tags()
 
                         if self.rb_3d.isChecked():
                             os.rename(file_w_path,

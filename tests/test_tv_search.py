@@ -1,7 +1,5 @@
-#!/home/jessequinn/.pyenv/versions/3.6.8/envs/tagger-3.6.8/bin/python
-
 """
-Unit tests for Tagger.TaggerTV Class.
+Unit tests for Search.TV Class.
 """
 
 from unittest import TestCase
@@ -13,22 +11,26 @@ load_dotenv()
 
 
 class TaggerTVTests(TestCase):
-    def setUp(self) -> None:
-        self.tv = search.TV(os.getenv('API_KEY'), language='en-US')
+    def setUp(self):
+        self.tv = search.TV(os.getenv('API_KEY'), language='en-US', query='game of thrones', season=1)
 
     def test_search_api_key(self):
         """
         Test initial api key variables of an instance of TV.
         :return:
         """
-        self.assertEqual(self.tv.get_api_key(), os.getenv('API_KEY'))
+        self.assertEqual(self.tv.api_key, os.getenv('API_KEY'))
+        with self.assertRaises(ValueError):
+            self.tv.api_key = '-sdfdsfdse43434'
 
     def test_search_language(self):
         """
         Test initial language variable of an instance of TV.
         :return:
         """
-        self.assertEqual(self.tv.get_language(), 'en-US')
+        self.assertEqual(self.tv.language, 'en-US')
+        with self.assertRaises(ValueError):
+            self.tv.language = 'enUS'
 
     def test_search_results(self):
         """
@@ -36,7 +38,7 @@ class TaggerTVTests(TestCase):
         :return:
         """
         self.assertEqual(
-            self.tv.search_tv_show(query='game of thrones', season=1)[0],
+            self.tv.search_tv_show()[0],
             [1399, 'Game of Thrones',
              ['Winter Is Coming', 'The Kingsroad', 'Lord Snow', 'Cripples, Bastards, and Broken Things',
               'The Wolf and the Lion', 'A Golden Crown', 'You Win or You Die', 'The Pointy End', 'Baelor',
