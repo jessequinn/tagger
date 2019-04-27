@@ -25,9 +25,12 @@ class MetaTag(object):
         Preserve encoding tool info.
         :return:
         """
-        encoding_tool = self.meta_tag['\xa9too']
-        self.meta_tag.delete()
-        self.meta_tag['\xa9too'] = encoding_tool
+        try:
+            encoding_tool = self.meta_tag['\xa9too']
+            self.meta_tag.delete()
+            self.meta_tag['\xa9too'] = encoding_tool
+        except KeyError:
+            self.meta_tag['\xa9too'] = ''
 
     def save_meta_tags(self):
         """

@@ -222,6 +222,7 @@ class MainWindow(QMainWindow, ui.Ui_MainWindow):
         self.lw_movie_release_date.clear()
         self.lw_movie_overview.clear()
         self.lw_movie_genres.clear()
+        self.prgbar_update.setValue(0)
 
         if self.cb_options.currentText() == 'Film':
             # set properties
